@@ -7,14 +7,14 @@
 #include <iostream>
 #include <fstream>
 #include <random>
-//#include <windows.h>
+#include <windows.h>
 
-using clock2 = std::chrono::system_clock;
-//using sec2 = std::chrono::duration<double>;
 using ms = std::chrono::duration<double, std::milli>;
 
 const int WINDOW_WIDTH = 64 * 10;
 const int WINDOW_HEIGHT = 32 * 10;
+
+const char* ROM_FILE_PATH = "C:\\rom.ch8";
 
 
 SDL_Window* gWindow = NULL;
@@ -53,11 +53,6 @@ uint8_t V[16];
 
 /***********************************************/
 
-/*
-uint32_t bg = 0x8F9185FF;
-uint32_t fg = 0x111D2BFF;
-*/
-
 uint32_t bg = 0x0;
 uint32_t fg = 0xFFFFFFFF;
 
@@ -89,8 +84,32 @@ int getPixel(int row, int column) {
 	return ( (row % 64) + (64 * (column % 32)) );
 }
 
-bool init()
-{
+bool init(){
+	/* TODO
+		OPENFILENAME ofn;
+		char file[255];
+
+		ZeroMemory(&ofn, sizeof(OPENFILENAME));
+		// Initialize remaining fields of OPENFILENAME structure
+		ofn.lStructSize = sizeof(ofn);
+		//ofn.hwndOwner = hWnd;
+		ofn.lpstrFile = file;
+		ofn.lpstrFile[0] = '\0';
+		ofn.nMaxFile = 255;
+
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetOpenFileName(&ofn))
+		{
+			std::cout << "Path: " << ofn.lpstrFile;
+
+		}
+	*/
+
 	//Initialization flag
 	bool success = true;
 
@@ -109,7 +128,7 @@ bool init()
 		}
 
 		//Create window
-		gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+		gWindow = SDL_CreateWindow("CHIP-8 Interpreter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 		if (gWindow == NULL)
 		{
 			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -288,7 +307,6 @@ void executeCycle() {
 			case 0xA:
 				nnn = (op_code & 0x0FFF);
 				I = nnn;
-				//printRegs();
 				break;
 			//JP V0, addr => Jump to location nnn + V0.
 			case 0xB:
@@ -412,15 +430,16 @@ void executeCycle() {
 }
 
 void beep() {
-	/*std::cout << '\a' << std::flush;
-	std::cout << '\a' << std::flush;*/
-	//Beep(900, 50);
-	//std::cout << '\a' << std::flush;
+	//TODO
+		/*std::cout << '\a' << std::flush;
+		std::cout << '\a' << std::flush;*/
+		//Beep(900, 50);
+		//std::cout << '\a' << std::flush;
 }
 
 int main(int argc, char* args[])
 {
-	std::ifstream fin("C:\\games\\brix.ch8", std::ifstream::binary);
+	std::ifstream fin(ROM_FILE_PATH, std::ifstream::binary);
 
 	for (int i = 0x200; !fin.eof() && i < 4096 * 2; i++) {
 		char byte[1];
@@ -429,9 +448,7 @@ int main(int argc, char* args[])
 	}
 
 	fin.close();
-	//printRam(128);
-	//beep();
-	
+
 
 
 	if (!init())
@@ -500,24 +517,10 @@ int main(int argc, char* args[])
 
 
 			executeCycle();
-		
-			/*
-			SDL_RenderClear(gRenderer);
-			SDL_RenderCopy(gRenderer, texture, NULL, NULL);
-			SDL_RenderPresent(gRenderer);
-			*/
-			
-
-			//auto t_end = std::chrono::high_resolution_clock::now();
-			//double elapsed_time_ms = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-			//std::cout << elapsed_time_ms << std::endl;
-			
+	
 			SDL_Delay(1);
 			
-			
-			//ms duration = clock2::now() - before;
-			//std::this_thread::sleep_for(std::chrono::milliseconds(1000/300));
-			//std::cout << "elapsed time: " << duration.count() << std::endl;
+
 		}
 	}
 
